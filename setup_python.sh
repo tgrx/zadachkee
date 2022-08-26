@@ -18,3 +18,4 @@ pyenv install --skip-existing "${version_required}" || exit 1
 echo "Python ${version_required} is configured"
 
 poetry env use 3.10.6
+poetry install

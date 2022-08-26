@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+    - main
   workflow_dispatch:
 
 env:
@@ -13,14 +13,15 @@ env:
   POETRY_VIRTUALENVS_IN_PROJECT: false
 
 jobs:
-  tests:
-    name: Tests.
+  tests-python:
+    name: 🐍 Python tests are passed.
     strategy:
       matrix:
         os:
-          - ubuntu-latest
+        - macos-latest
+        - ubuntu-latest
         python-version:
-          - 3.10.6
+        - 3.10.6
     runs-on: ${{ matrix.os }}
     outputs:
       cache-key: ${{ steps.cache-key.outputs.value }}
@@ -28,33 +29,33 @@ jobs:
       python-version: ${{ matrix.python-version }}
       runs-on: ${{ matrix.os }}
     steps:
-      - name: 📥 Code is pulled from repo.
-        uses: actions/checkout@v2
-      - name: 🐍 Python runtime is set up.
-        uses: actions/setup-python@v2
-        with:
-          architecture: 'x64'
-          python-version: ${{ matrix.python-version }}
-      - name: 🔑 Runtime cache key is calculated.
-        id: cache-key
-        run: |
-          echo "::set-output name=value::cache-runtime-${{ matrix.os }}-${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-${{ env.CACHE_CUSTOM_KEY }}"
-      - name: 📦 Runtime is cached and restored.
-        id: cache-runtime
-        uses: actions/cache@v2
-        with:
-          key: ${{ steps.cache-key.outputs.value }}
-          path: ${{ env.pythonLocation }}
-      - name: 🔌 Poetry is installed.
-        if: ${{ !steps.cache-runtime.outputs.cache-hit }}
-        run: |
-          pip install pipx
-          pipx install poetry
-      - name: 🔋 Dependencies are installed.
-        if: ${{ !steps.cache-runtime.outputs.cache-hit }}
-        run: |
-          poetry export --dev --format=requirements.txt --output=requirements.txt --without-hashes
-          pip install --requirement requirements.txt
-      - name: ☯️ Tests are passed.
-        if: ${{ steps.restore-build.outputs.cache-hit }}
-        run: make qa
+    - name: 📥 Code is pulled from repo.
+      uses: actions/checkout@v2
+    - name: 🐍 Python runtime is set up.
+      uses: actions/setup-python@v2
+      with:
+        architecture: 'x64'
+        python-version: ${{ matrix.python-version }}
+    - name: 🔑 Runtime cache key is calculated.
+      id: cache-key
+      run: |
+        echo "::set-output name=value::cache-runtime-${{ matrix.os }}-${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-${{ env.CACHE_CUSTOM_KEY }}"
+    - name: 📦 Runtime is cached and restored.
+      id: cache-runtime
+      uses: actions/cache@v2
+      with:
+        key: ${{ steps.cache-key.outputs.value }}
+        path: ${{ env.pythonLocation }}
+    - name: 🔌 Poetry is installed.
+      if: ${{ !steps.cache-runtime.outputs.cache-hit }}
+      run: |
+        pip install pipx
+        pipx install poetry
+    - name: 🔋 Dependencies are installed.
+      if: ${{ !steps.cache-runtime.outputs.cache-hit }}
+      run: |
+        poetry export --dev --format=requirements.txt --output=requirements.txt --without-hashes
+        pip install --requirement requirements.txt
+    - name: ☯️ Tests are passed.
+      if: ${{ !steps.cache-runtime.outputs.cache-hit }}
+      run: make qa-python

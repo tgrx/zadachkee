@@ -1,4 +1,4 @@
-from algo.stones_and_jewels.task import solution
+from algo.stones_and_jewels.solution import solution
 
 
 def test() -> None:
