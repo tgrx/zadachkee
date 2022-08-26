@@ -1,0 +1,9 @@
+[flake8]
+exclude =
+    .artifacts
+    .git
+    .github
+    .run
+ignore = S101,B101
+max_annotations_complexity = 4
+max_cognitive_complexity = 12
